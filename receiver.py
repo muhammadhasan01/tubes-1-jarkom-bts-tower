@@ -1,5 +1,6 @@
 import socket
-import packet
+import utils
+from packet import Packet
 import sys
 import os
 
@@ -32,8 +33,9 @@ fileToWrite = ''
 while(True):
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
 
-    packet = bytesAddressPair[0]
+    RAW = bytesAddressPair[0]
     address = bytesAddressPair[1]
+    packet = utils.turnRawToPacket(RAW)
     type = packet.type
     data = packet.data
 
@@ -44,11 +46,12 @@ while(True):
         print(clientMsg)
         print(clientIP)
         fileToWrite += str(packet.data, encoding)
-        ACK = packet.Packet(b'\x01', 0, 0, b'Packet is received')
+        ACK = Packet(b'\x01', 0, 0, b'Packet is received')
         UDPServerSocket.sendto(ACK, address)
     
     # If packet type is FIN, save to file and send FINACK
     if (type == b'\x02'):
+        fileToWrite += str(packet.data, encoding)
         # Make new directory
         current_dir = os.getcwd()
         final_dir = os.path.join(current_dir, r'./out')
@@ -62,8 +65,9 @@ while(True):
         textFile.close()
 
         # Send FINACK
-        FINACK = packet.Packet(b'\x03', 0, 0, b'File is downloaded')
-        UDPServerSocket.sendto(FINACK, address)
+        FINACK = Packet(b'\x03', 0, 0, b'File is downloaded')
+        bytesToSend = FINACK.getRAW() # Send packet in the form of RAW
+        UDPServerSocket.sendto(bytesToSend, address)
 
         # Prepare for next file
         fileToWrite =''
