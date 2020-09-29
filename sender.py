@@ -1,13 +1,16 @@
 import socket
 
-UDP_IP = "127.0.0.1"
-UDP_PORT = 5005
-MESSAGE = b"Hello, World!"
+msgFromClient = "Hello UDP Server"
+bytesToSend = str.encode(msgFromClient)
+serverAddressPort = ("127.0.0.1", 20001)
+bufferSize = 1024
 
-print("UDP target IP: %s" % UDP_IP)
-print("UDP target port: %s" % UDP_PORT)
-print("message: %s" % MESSAGE)
+# Create a UDP socket at client side
+UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
-sock = socket.socket(socket.AF_INET, # Internet
-                     socket.SOCK_DGRAM) # UDP
-sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+# Send to server using created UDP socket
+UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+
+msgFromServer = UDPClientSocket.recvfrom(bufferSize)
+msg = "Message from Server {}".format(msgFromServer[0])
+print(msg)
