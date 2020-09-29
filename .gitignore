@@ -11,6 +11,7 @@ test.txt
 *.so
 
 # Distribution / packaging
+out/
 .Python
 build/
 develop-eggs/
