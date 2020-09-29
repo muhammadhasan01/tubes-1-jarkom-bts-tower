@@ -5,4 +5,3 @@
 # Contoh: echo "$1" | python3 receiver.py 
 
 python receiver.py "$1"
-$SHELL
