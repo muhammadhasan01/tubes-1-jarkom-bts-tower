@@ -1,7 +1,7 @@
 import socket
 
-localIP = "127.0.0.1"
-localPort = 20001
+IPAdress = "127.0.0.1"
+Port = 20001
 bufferSize = 1024
 
 msgFromServer = "Hello UDP Client"
@@ -11,7 +11,7 @@ bytesToSend = str.encode(msgFromServer)
 UDPServerSocket = socket.socket(family = socket.AF_INET, type = socket.SOCK_DGRAM)
 
 # Bind to address and ip
-UDPServerSocket.bind((localIP, localPort))
+UDPServerSocket.bind((IPAdress, Port))
 
 print("UDP server up and listening")
 
@@ -27,6 +27,6 @@ while(True):
     
     print(clientMsg)
     print(clientIP)
-    
+
     # Sending a reply to client
     UDPServerSocket.sendto(bytesToSend, address)
