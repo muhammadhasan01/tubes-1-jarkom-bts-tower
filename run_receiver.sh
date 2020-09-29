@@ -4,4 +4,4 @@
 # $1 berisi port untuk di bind (akan diisi oleh autograder)
 # Contoh: echo "$1" | python3 receiver.py 
 
-python receiver.py "$1"
+python3 receiver.py "$1"
