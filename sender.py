@@ -43,4 +43,4 @@ for address in listOfAddresses:
         print("Sending packet number", p.sequenceNumber, "with length", p.length, \
               "to", serverAddressPort)
         while not send(p,serverAddressPort):
-            i+=1
+            pass
