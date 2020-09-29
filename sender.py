@@ -1,51 +1,32 @@
-import socket
-import sys
+import socket, sys
+from packet import Packet
+from utils import parseSenderArgument, turnMessageToPackets, turnRawToPacket
 
 # Take arguments
 # Arguments should be in the format [filePath] [addresses...] [port]
-listOfSysArg = list(sys.argv)
-lenSysArg = len(listOfSysArg)
-
-# Check number of arguments
-if lenSysArg <= 3: # Notice that the script py file (sender.py) is included
-    print("Arguments not correct, please input arguments of [addr] port")
-    exit()
-
-# Parse arguments (assumes that is in the correct format)
-
-# Take fileContent
-try:
-    fileContent = open(listOfSysArg[1], 'r').read()
-except:
-    print("Error file not found in the specified path")
-    exit()
-
-# Take server addresses
-listOfAddresses = [listOfSysArg[i] for i in range(2, lenSysArg - 1)]
-
-# Take port
-port = listOfSysArg[-1]
-
-print(fileContent)
-print(listOfAddresses)
-print(port)
-
-# TODO: Turn fileContent to packets
-# TODO: Handle retransmission time
-
-msgFromClient = "Hello UDP Server"
-bytesToSend = str.encode(msgFromClient)
-print(bytesToSend)
-port = 20001
-serverAddressPort = ("127.0.0.1", port)
-bufferSize = 1024
+(fileContent, listOfAddresses, port) = parseSenderArgument(sys.argv)
 
 # Create a UDP socket at client side
 UDPClientSocket = socket.socket(family = socket.AF_INET, type = socket.SOCK_DGRAM)
+# Set buffersize to 2^16 to be safe
+bufferSize = (1 << 16) 
 
-# Send to server using created UDP socket
-UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+# print(fileContent)
 
-msgFromServer = UDPClientSocket.recvfrom(bufferSize)
-msg = "Message from Server {}".format(msgFromServer[0])
-print(msg)
+# Turn fileContent to packets
+packets = turnMessageToPackets(fileContent)
+
+# Send message/packets to every receiver
+for address in listOfAddresses:
+    # TODO: Handle Scheduling
+    serverAddressPort = (address, port)
+    for p in packets:
+        print("Sending packet number", p.sequenceNumber, "to", serverAddressPort)
+        print("PACKET INFO:", p.type, p.length, p.sequenceNumber, p.checksum, p.data, sep = '\n')
+        bytesToSend = p.getRAW() # Send packet in the form of RAW
+        UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+
+        msgFromServer = UDPClientSocket.recvfrom(bufferSize) # Received Packet in the form of RAW
+        receivedPacket = turnRawToPacket(bytesToSend)
+        # TODO: Handle packet type
+        print("Received packet of type", receivedPacket.type)
