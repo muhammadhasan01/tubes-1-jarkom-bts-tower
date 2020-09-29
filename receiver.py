@@ -59,7 +59,7 @@ while True:
             os.makedirs(final_dir)
 
         # Save to file
-        complete_dir = os.path.join(final_dir, 'downloaded.txt')
+        complete_dir = os.path.join(final_dir, 'downloaded')
         textFile = open(complete_dir, "w")
         textFile.write(fileToWrite)
         textFile.close()
