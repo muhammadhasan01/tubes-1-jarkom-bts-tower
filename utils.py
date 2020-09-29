@@ -18,7 +18,7 @@ def parseSenderArgument(args):
         exit()
 
     # Take server addresses
-    listOfAddresses = [listOfSysArg[i] for i in range(2, lenSysArg - 1)]
+    listOfAddresses = listOfSysArg[2].split(',')
 
     # Take port
     port = int(listOfSysArg[-1])
@@ -27,14 +27,14 @@ def parseSenderArgument(args):
 
 def turnMessageToPackets(msg, maxSize = 32767):
     packets = []
-    it, lenMsg = 0, len(msg)
+    it, seq, lenMsg = 0, 0, len(msg)
     while it < lenMsg:
         # (TYPE, LENGTH, SEQUENCE NUMBER, CHECKSUM, DATA)
         newPacket = Packet(b'\x00' if it + maxSize < lenMsg else b'\x02', \
-                           min(lenMsg - it, maxSize), it, \
+                           min(lenMsg - it, maxSize), seq, \
                            msg[it: it + maxSize])
         packets += [newPacket]
-        it += maxSize
+        it, seq = it + maxSize, seq + 1
     return packets
 
 def turnRawToPacket(raw):
@@ -42,5 +42,5 @@ def turnRawToPacket(raw):
     length = int.from_bytes(raw[1: 3], 'big')
     sequenceNumber = int.from_bytes(raw[3: 5], 'big')
     checksum = raw[5: 7]
-    data = raw[7: 7 + length]
+    data = raw[7:]
     return Packet(tipe, length, sequenceNumber, data, checksum)

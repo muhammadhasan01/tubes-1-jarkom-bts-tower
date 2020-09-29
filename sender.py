@@ -8,25 +8,43 @@ from utils import parseSenderArgument, turnMessageToPackets, turnRawToPacket
 
 # Create a UDP socket at client side
 UDPClientSocket = socket.socket(family = socket.AF_INET, type = socket.SOCK_DGRAM)
-# Set buffersize to 2^16 to be safe
-bufferSize = (1 << 16) 
-
-# print(fileContent)
+# Set buffersize to 2^16 just to be safe
+bufferSize = (1 << 16)
 
 # Turn fileContent to packets
 packets = turnMessageToPackets(fileContent)
+
+
+
+def send(p: Packet, target):
+    try:
+        bytesToSend = p.getRAW() # Send packet in the form of RAW
+        UDPClientSocket.sendto(bytesToSend, target)
+        UDPClientSocket.settimeout(1)
+        (msgFromServer, _) = UDPClientSocket.recvfrom(bufferSize) # Received Packet in the form of RAW
+        # print("MESSAGE:", msgFromServer)
+        receivedPacket = turnRawToPacket(msgFromServer)
+        if not receivedPacket.isChecksumValid():
+            return False
+        if receivedPacket.type==b'\x00' or receivedPacket.type==b'\x02':
+            return False
+        # TODO: Handle packet type
+        print("Received packet of type", receivedPacket.type)
+        return True
+    except socket.timeout:
+        print("Timeout, try to send packet again")
+        return False
 
 # Send message/packets to every receiver
 for address in listOfAddresses:
     # TODO: Handle Scheduling
     serverAddressPort = (address, port)
     for p in packets:
-        print("Sending packet number", p.sequenceNumber, "to", serverAddressPort)
-        print("PACKET INFO:", p.type, p.length, p.sequenceNumber, p.checksum, p.data, sep = '\n')
-        bytesToSend = p.getRAW() # Send packet in the form of RAW
-        UDPClientSocket.sendto(bytesToSend, serverAddressPort)
-
-        msgFromServer = UDPClientSocket.recvfrom(bufferSize) # Received Packet in the form of RAW
-        receivedPacket = turnRawToPacket(bytesToSend)
-        # TODO: Handle packet type
-        print("Received packet of type", receivedPacket.type)
+        print("Sending packet number", p.sequenceNumber, "with length", p.length, \
+              "to", serverAddressPort)
+        i=0
+        while not send(p,serverAddressPort) and i < 5:
+            i+=1
+        if i>=5:
+            print("5 times no respons from server")
+            break
