@@ -39,7 +39,7 @@ def turnMessageToPackets(msg, maxSize = 32767):
 
 def turnRawToPacket(raw):
     tipe = int(raw[0]).to_bytes(1, 'big')
-    length = int.from_bytes(raw[1: 3], 'big)
+    length = int.from_bytes(raw[1: 3], 'big')
     sequenceNumber = int.from_bytes(raw[3: 5], 'big')
     checksum = raw[5: 7]
     data = raw[7: 7 + length]
