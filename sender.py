@@ -19,7 +19,7 @@ for address in listOfAddresses:
     # TODO: Handle Scheduling
     serverAddressPort = (address, port)
     for p in packets:
-        print("Sending packet number", p.sequenceNumber, "with length", p.length
+        print("Sending packet number", p.sequenceNumber, "with length", p.length, \
               "to", serverAddressPort)
         bytesToSend = p.getRAW() # Send packet in the form of RAW
         UDPClientSocket.sendto(bytesToSend, serverAddressPort)
