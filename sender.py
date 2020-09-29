@@ -42,9 +42,5 @@ for address in listOfAddresses:
     for p in packets:
         print("Sending packet number", p.sequenceNumber, "with length", p.length, \
               "to", serverAddressPort)
-        i=0
-        while not send(p,serverAddressPort) and i < 5:
+        while not send(p,serverAddressPort):
             i+=1
-        if i>=5:
-            print("5 times no respons from server")
-            break
