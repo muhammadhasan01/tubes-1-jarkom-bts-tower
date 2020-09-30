@@ -25,7 +25,7 @@ def send(p: Packet, target):
         # print("MESSAGE:", msgFromServer)
         receivedPacket = turnRawToPacket(msgFromServer)
         # TODO: Handle packet type
-        print("Received packet of type", receivedPacket.type)
+        print("Received packet of type", receivedPacket.type, "with no", receivedPacket.sequenceNumber)
         return True
     except socket.timeout:
         print("Timeout, try to send packet again")
