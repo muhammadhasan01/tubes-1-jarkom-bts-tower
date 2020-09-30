@@ -14,24 +14,29 @@ bufferSize = (1 << 16)
 # Turn fileContent to packets
 packets = turnMessageToPackets(fileContent)
 
+
+
 def send(p: Packet, target):
     try:
         bytesToSend = p.getRAW() # Send packet in the form of RAW
         UDPClientSocket.sendto(bytesToSend, target)
         UDPClientSocket.settimeout(1)
         (msgFromServer, _) = UDPClientSocket.recvfrom(bufferSize) # Received Packet in the form of RAW
+        # print("MESSAGE:", msgFromServer)
         receivedPacket = turnRawToPacket(msgFromServer)
-        print("Received packet of type", receivedPacket.type, "with a sequence", receivedPacket.sequenceNumber)
-        return True 
+        # TODO: Handle packet type
+        print("Received packet of type", receivedPacket.type)
+        return True
     except socket.timeout:
-        print("Timeout, trying to send packet again")
+        print("Timeout, try to send packet again")
         return False
 
 # Send message/packets to every receiver
 for address in listOfAddresses:
+    # TODO: Handle Scheduling
     serverAddressPort = (address, port)
     for p in packets:
         print("Sending packet number", p.sequenceNumber, "with length", p.length, \
-              "and type", p.type, "to", serverAddressPort)
+              "to", serverAddressPort)
         while not send(p,serverAddressPort):
             pass
