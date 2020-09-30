@@ -4,7 +4,7 @@ from packet import Packet
 import sys
 import os
 
-IPAdress = '127.0.0.1'
+IPAdress = ''
 bufferSize = (1 << 16) 
 encoding = 'utf-8'
 
