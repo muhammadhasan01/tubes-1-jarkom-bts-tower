@@ -52,10 +52,6 @@ while True:
         continue;
 
     if len(sequence)==0 and packet.sequenceNumber != 0:
-        # send acknowledgement againt
-        ACK = Packet(b'\x01', 0, packet.sequenceNumber , b'Packet is received')
-        bytesToSend = ACK.getRAW()
-        UDPServerSocket.sendto(bytesToSend, address)
         continue;
 
     # If packet type is DATA, send ACK

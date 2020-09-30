@@ -25,6 +25,7 @@ def send(p: Packet, target):
         # print("MESSAGE:", msgFromServer)
         receivedPacket = turnRawToPacket(msgFromServer)
         if ackAddress != target:
+            print("Address didn't matching")
             return False
         if not receivedPacket.isChecksumValid():
             print("Checksum not valid, try to send packet again")
