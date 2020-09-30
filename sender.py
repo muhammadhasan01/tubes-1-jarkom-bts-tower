@@ -15,17 +15,21 @@ bufferSize = (1 << 16)
 packets = turnMessageToPackets(fileContent)
 
 def send(p: Packet, target):
-    UDPClientSocket.settimeout(2)
+    UDPClientSocket.settimeout(1)
     try:
         bytesToSend = p.getRAW() # Send packet in the form of RAW
         UDPClientSocket.sendto(bytesToSend, target)
         (msgFromServer, _) = UDPClientSocket.recvfrom(bufferSize) # Received Packet in the form of RAW
-        # print("MESSAGE:", msgFromServer)
         receivedPacket = turnRawToPacket(msgFromServer)
+
+        if receivedPacket.checksum != p.checksum:
+            print("Checksum not the same, trying to send packet again")
+            return False
+
         print("Received packet of type", receivedPacket.type, "with a sequence", receivedPacket.sequenceNumber)
         return True 
     except socket.timeout:
-        print("Timeout, try to send packet again")
+        print("Timeout, trying to send packet again")
         return False
 
 # Send message/packets to every receiver

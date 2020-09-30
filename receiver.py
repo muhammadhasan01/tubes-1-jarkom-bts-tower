@@ -44,8 +44,8 @@ while True:
         print("Received packet isCheckSum is not valid")
         continue;
 
-    print("Received packet of type", type, "with a sequence", sequence, \
-          "and length", packet.length)
+    # print("Received packet of type", type, "with a sequence", sequence, \
+    #      "and length", packet.length)
 
     # If packet type is DATA, send ACK
     if type == b'\x00':
@@ -77,6 +77,3 @@ while True:
 
         # Finish
         exit()
-
-        # Prepare for next file
-        fileToWrite = ''
