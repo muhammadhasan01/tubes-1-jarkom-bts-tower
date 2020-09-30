@@ -18,7 +18,7 @@ def send(p: Packet, target):
     try:
         bytesToSend = p.getRAW() # Send packet in the form of RAW
         UDPClientSocket.sendto(bytesToSend, target)
-        UDPClientSocket.settimeout(1)
+        UDPClientSocket.settimeout(3)
         (msgFromServer, _) = UDPClientSocket.recvfrom(bufferSize) # Received Packet in the form of RAW
         receivedPacket = turnRawToPacket(msgFromServer)
 
