@@ -4,7 +4,7 @@ from packet import Packet
 import sys
 import os
 
-IPAdress = ""
+IPAdress = '127.0.0.1'
 bufferSize = (1 << 16) 
 encoding = 'utf-8'
 
@@ -38,14 +38,20 @@ while True:
     packet = utils.turnRawToPacket(RAW)
     type = packet.type
     data = packet.data
+    sequence = packet.sequenceNumber
     
     if not packet.isChecksumValid():
+        print("Received packet isCheckSum is not valid")
         continue;
+
+    print("Received packet of type", type, "with a sequence", sequence, \
+          "and length", packet.length)
 
     # If packet type is DATA, send ACK
     if type == b'\x00':
+        
         fileToWrite += str(packet.data, encoding)
-        ACK = Packet(b'\x01', 0, 0, b'Packet is received')
+        ACK = Packet(b'\x01', 18, sequence, b'Packet is received', packet.checksum)
         bytesToSend = ACK.getRAW()
         UDPServerSocket.sendto(bytesToSend, address)
 
@@ -65,7 +71,7 @@ while True:
         textFile.close()
 
         # Send FINACK
-        FINACK = Packet(b'\x03', 0, 0, b'File is downloaded')
+        FINACK = Packet(b'\x03', 18, sequence, b'File is downloaded', packet.checksum)
         bytesToSend = FINACK.getRAW() # Send packet in the form of RAW
         UDPServerSocket.sendto(bytesToSend, address)
 
