@@ -18,7 +18,7 @@ def send(p: Packet, target):
     try:
         bytesToSend = p.getRAW() # Send packet in the form of RAW
         UDPClientSocket.sendto(bytesToSend, target)
-        UDPClientSocket.settimeout(5)
+        UDPClientSocket.settimeout(1)
         (msgFromServer, _) = UDPClientSocket.recvfrom(bufferSize) # Received Packet in the form of RAW
         receivedPacket = turnRawToPacket(msgFromServer)
         print("Received packet of type", receivedPacket.type, "with a sequence", receivedPacket.sequenceNumber)

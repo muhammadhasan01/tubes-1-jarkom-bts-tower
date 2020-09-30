@@ -29,6 +29,9 @@ print("UDP server up and listening")
 
 fileToWrite = ''
 
+
+mapSeq = {}
+
 # Listen for incoming datagrams
 while True:
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
@@ -40,6 +43,12 @@ while True:
     data = packet.data
     sequence = packet.sequenceNumber
     
+    if sequence in mapSeq:
+        print("Sequence already received")
+        continue
+
+    mapSeq[sequence] = True
+
     if not packet.isChecksumValid():
         print("Received packet isCheckSum is not valid")
         continue
