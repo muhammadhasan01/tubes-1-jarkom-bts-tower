@@ -29,6 +29,8 @@ print("UDP server up and listening")
 
 fileToWrite = ''
 
+mapSeq = {}
+
 # Listen for incoming datagrams
 while True:
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
@@ -45,14 +47,16 @@ while True:
 
     # If packet type is DATA, send ACK
     if type == b'\x00':
-        fileToWrite += str(packet.data, encoding)
+        if not seq in mapSeq:
+            fileToWrite += str(packet.data, encoding)
         ACK = Packet(b'\x01', 0, seq, b'Packet is received')
         bytesToSend = ACK.getRAW()
         UDPServerSocket.sendto(bytesToSend, address)
 
     # If packet type is FIN, save to file and send FINACK
     elif type == b'\x02':
-        fileToWrite += str(packet.data, encoding)
+        if not seq in mapSeq:
+            fileToWrite += str(packet.data, encoding)
         # Make new directory
         current_dir = os.getcwd()
         final_dir = os.path.join(current_dir, r'./out')
@@ -71,6 +75,5 @@ while True:
         UDPServerSocket.sendto(bytesToSend, address)
 
         exit()
-
-        # Prepare for next file
-        fileToWrite = ''
+    
+    mapSeq[seq] = True
