@@ -42,7 +42,7 @@ while True:
     
     if not packet.isChecksumValid():
         print("Received packet isCheckSum is not valid")
-        continue;
+        continue
 
     # print("Received packet of type", type, "with a sequence", sequence, \
     #      "and length", packet.length)
