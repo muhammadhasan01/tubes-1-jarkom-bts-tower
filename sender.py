@@ -20,15 +20,20 @@ def send(p: Packet, target):
     try:
         bytesToSend = p.getRAW() # Send packet in the form of RAW
         UDPClientSocket.sendto(bytesToSend, target)
-        UDPClientSocket.settimeout(1)
-        (msgFromServer, _) = UDPClientSocket.recvfrom(bufferSize) # Received Packet in the form of RAW
+        UDPClientSocket.settimeout(5)
+        (msgFromServer, ackAddress) = UDPClientSocket.recvfrom(bufferSize) # Received Packet in the form of RAW
         # print("MESSAGE:", msgFromServer)
         receivedPacket = turnRawToPacket(msgFromServer)
+        if ackAddress != target:
+            return False
         if not receivedPacket.isChecksumValid():
+            print("Checksum not valid, try to send packet again")
             return False
         if receivedPacket.type==b'\x00' or receivedPacket.type==b'\x02':
+            print("not an acknowledgement, try to send packet again")
             return False
         if receivedPacket.sequenceNumber!=p.sequenceNumber:
+            print("sequence number false, try to send packet again")
             return False
         print("Received packet of type", receivedPacket.type)
         return True
