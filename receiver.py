@@ -29,6 +29,8 @@ print("UDP server up and listening")
 
 fileToWrite = ''
 
+sequence = []
+
 # Listen for incoming datagrams
 while True:
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
@@ -42,12 +44,17 @@ while True:
     if not packet.isChecksumValid():
         continue;
 
+    if packet.sequenceNumber in sequence:
+        continue;
+
     # If packet type is DATA, send ACK
     if type == b'\x00':
         fileToWrite += str(packet.data, encoding)
-        ACK = Packet(b'\x01', 0, 0, b'Packet is received')
+        ACK = Packet(b'\x01', 0, packet.sequenceNumber , b'Packet is received')
         bytesToSend = ACK.getRAW()
         UDPServerSocket.sendto(bytesToSend, address)
+        sequence.append(packet.sequenceNumber)
+        print(sequence)
 
     # If packet type is FIN, save to file and send FINACK
     elif type == b'\x02':
@@ -65,10 +72,11 @@ while True:
         textFile.close()
 
         # Send FINACK
-        FINACK = Packet(b'\x03', 0, 0, b'File is downloaded')
+        FINACK = Packet(b'\x03', 0, packet.sequenceNumber, b'File is downloaded')
         bytesToSend = FINACK.getRAW() # Send packet in the form of RAW
         UDPServerSocket.sendto(bytesToSend, address)
 
         # Prepare for next file
         fileToWrite = ''
+        sequence = []
 

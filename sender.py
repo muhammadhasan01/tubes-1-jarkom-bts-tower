@@ -28,7 +28,8 @@ def send(p: Packet, target):
             return False
         if receivedPacket.type==b'\x00' or receivedPacket.type==b'\x02':
             return False
-        # TODO: Handle packet type
+        if receivedPacket.sequenceNumber!=p.sequenceNumber:
+            return False
         print("Received packet of type", receivedPacket.type)
         return True
     except socket.timeout:
