@@ -22,9 +22,6 @@ def send(p: Packet, target):
         (msgFromServer, _) = UDPClientSocket.recvfrom(bufferSize) # Received Packet in the form of RAW
         # print("MESSAGE:", msgFromServer)
         receivedPacket = turnRawToPacket(msgFromServer)
-        if receivedPacket.checksum != p.checksum:
-            print("Checksum is not the same as the sended packet")
-            return False
         print("Received packet of type", receivedPacket.type, "with a sequence", receivedPacket.sequenceNumber)
         return True 
     except socket.timeout:

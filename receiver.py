@@ -4,7 +4,7 @@ from packet import Packet
 import sys
 import os
 
-IPAdress = ''
+IPAdress = ""
 bufferSize = (1 << 16) 
 encoding = 'utf-8'
 
@@ -74,6 +74,9 @@ while True:
         FINACK = Packet(b'\x03', 18, sequence, b'File is downloaded', packet.checksum)
         bytesToSend = FINACK.getRAW() # Send packet in the form of RAW
         UDPServerSocket.sendto(bytesToSend, address)
+
+        # Finish
+        exit()
 
         # Prepare for next file
         fileToWrite = ''
