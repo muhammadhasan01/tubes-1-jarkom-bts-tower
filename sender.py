@@ -15,15 +15,19 @@ bufferSize = (1 << 16)
 packets = turnMessageToPackets(fileContent)
 
 def send(p: Packet, target):
-    UDPClientSocket.settimeout(1)
     try:
         bytesToSend = p.getRAW() # Send packet in the form of RAW
         UDPClientSocket.sendto(bytesToSend, target)
+        UDPClientSocket.settimeout(1)
         (msgFromServer, _) = UDPClientSocket.recvfrom(bufferSize) # Received Packet in the form of RAW
         receivedPacket = turnRawToPacket(msgFromServer)
 
         if receivedPacket.checksum != p.checksum:
             print("Checksum not the same, trying to send packet again")
+            return False
+
+        if not receivedPacket.isChecksumValid():
+            print("Checksum is not valid!")
             return False
 
         print("Received packet of type", receivedPacket.type, "with a sequence", receivedPacket.sequenceNumber)
